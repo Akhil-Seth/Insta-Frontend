@@ -1,0 +1,54 @@
+<%- include('../includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/insta.css">
+</head>
+
+<body>
+   <%- include('../includes/navigation.ejs') %>
+
+   
+  <section class="stats">
+    <div class="stats__img-holder" style="background-image: url('<%= image %>');">      
+    </div>
+    <div class="stats__data">
+      <div class="stats__data__point">
+        <div class="stats__data__point__value"><%= postNo %></div>
+        <div class="stats__data__point__description">Posts</div>
+      </div>
+      <div class="stats__data__point">
+        <div class="stats__data__point__value"><%= follow %></div>
+        <div class="stats__data__point__description">Followers</div>
+      </div>
+      <div class="stats__data__point">
+        <div class="stats__data__point__value"><%= following %></div>
+        <div class="stats__data__point__description">Following</div>
+      </div>
+    </div>      
+  </section>
+  <section class="description">
+    <h2 class="decription__title">Instagram</h2>
+    <p>
+        <%= bio %>
+    </p>
+  </section>
+  <section class="actions">
+    <% if(!same){ %>
+      <form action="/follow" method="POST"><input type="hidden" value="<%= userId %>" name="id" id="id"><input type="hidden" value="<%= userSend %>" name="send" id="send"><button class="btn">Follow</button></form>
+    <button class="btn">Message</button>
+    <% } %>
+  </section>
+  <section class="stories">
+    
+  </section>
+  <section class="grid">
+    <% if (posts.length > 0) { %>
+      <% for (let post of posts) { %>
+    <a class="grid__photo" style="background-image: url('/<%= post.image %>');"></a>  
+    <img src="/<%= post.image %>" alt="">
+    <p><%= post.title %></p>
+    <p><%= post.image %></p>
+    <% } %>
+    <% } %>
+  </section>
+</div>
+
+<%- include('../includes/end.ejs') %>

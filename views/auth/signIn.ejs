@@ -1,0 +1,57 @@
+<%- include('../includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/forms.css">
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+
+<body>
+   <%- include('../includes/navigation.ejs') %>
+
+    <main> 
+        <% if (errorMess) { %>
+            <div class="user-message user-message--error"><%= errorMess  %></div>
+            <%}%>
+        <form class="auth-form" action="/SignInAdmin" method="POST" enctype="multipart/form-data">
+            <div class="form-control">
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" >
+            </div>
+            <div class="form-control">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" >
+            </div>
+            <div class="form-control">
+                <label for="password2">Re Write Password</label>
+                <input type="password" name="password2" id="password2" >
+            </div>
+            <div class="form-control">
+                <label for="name">Name</label>
+                <input type="name" name="name" id="name" >
+            </div>
+            <div class="form-control">
+                <label for="rno">Roll No</label>
+                <input type="rno" name="rno" id="rno" >
+            </div>
+            <div class="form-control">
+                <label for="country">Country Name</label>
+                <input type="rno" name="country" id="country" >
+            </div>
+            <div class="form-control">
+                <label for="phone">Phone No (Whatsapp)</label>
+                <input type="text" name="phone" id="phone" >
+            </div>
+            <div class="form-control">
+                <label for="clg">Clg Name</label>
+                <input type="clg" name="clg" id="clg" >
+            </div>
+            <div class="form-control">
+                <label for="image">Image</label>
+                <input type="file" name="image" id="image" >
+            </div>
+            <div class="form-control">
+                <label for="post">Post</label>
+                <input type="text" name="post" id="post" >
+            </div>
+            <button class="btn" type="submit"> SignIN</button>
+        </form>
+    </main>
+<%- include('../includes/end.ejs') %>

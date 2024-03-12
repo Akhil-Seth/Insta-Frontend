@@ -7,12 +7,10 @@ const multer = require('multer');
 const session = require('express-session');
 const User = require('./models/user');
 const MongoDBStore = require('connect-mongodb-session')(session);
-const csrf = require('csurf');
-const flash = require('connect-flash');
-const helmet = require('helmet');
-const compression = require('compression');
-const morgan = require('morgan');
+// const csrf = require('csurf');
 const fs = require('fs');
+const openSocket = require('socket.io-client');
+const flash = require('connect-flash');
 
 
 const errorController = require('./controllers/error');
@@ -20,12 +18,10 @@ const errorController = require('./controllers/error');
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
-const MONGODB_URI = `mongodb+srv://Akhil:AkhilAkhilAkhil@cluster0.b5mrcx2.mongodb.net/shop`;
-console.log(MONGODB_URI);
+const MONGODB_URI = `mongodb://localhost:27017/?directConnection=true`;
 
-const adminRoutes = require('./routes/admin');
-const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
+const adminRoutes = require('./routes/admin');
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -48,31 +44,29 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const store = new MongoDBStore({
-  uri: MONGODB_URI,
-  collection: 'sessions'
-});
+app.use(session({
+  secret: 'Akhil',
+  resave: false,
+  saveUninitialized: false
+}));
 
-const logStream = fs.createWriteStream(path.join(__dirname , 'access.Log') , { flags : 'a'});
-
-app.use(helmet());
-app.use(compression());
-app.use(morgan('combined', { stream: logStream }));
+// const store = new MongoDBStore({
+//   uri: MONGODB_URI,
+//   collection: 'sessions'
+// });
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(multer({ storage: fileStorage , fileFilter: fileFilter}).single('image'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
-app.use(
-  session({ secret: 'my secret', resave: false, saveUninitialized: false  , store: store})
-);
-const csrfProtection = csrf();
+
+// const csrfProtection = csrf();
 
 app.use((req, res, next) => {
-  if (!req.session.user) {
+  if (!req.user) {
     return next();
   }
-  User.findById(req.session.user._id)
+  User.findById(req.user._id)
     .then(user => {
       req.user = user;
       next();
@@ -80,42 +74,45 @@ app.use((req, res, next) => {
     .catch(err => console.log(err));
 });
 
-app.use(csrfProtection);
+// app.use(csrfProtection);
 app.use(flash());
 
 app.use((req, res, next) => {
-  res.locals.isLoggedIn = req.session.isLoggedIn;
-  res.locals.csrfToken = req.csrfToken();
+  // res.locals.isLoggedIn = req.session.isLoggedIn;
+  // res.locals.csrfToken = req.csrfToken();
   next();
 });
 
-app.use((error , req , res , next) => {
-  console.log(error);
-  const statusCd = error.statusCode || 500;
-  const mess = error.message;
-  res.status(statusCd).json({message : mess});
-  next();
-});
+// app.use((error , req , res , next) => {
+//   console.log(`error = ${error}`);
+//   const statusCd = error.statusCode || 500;
+//   const mess = error.message;
+//   res.status(statusCd).json({message : mess});
+//   next();
+// });
 
-app.use('/admin', adminRoutes);
-app.use(shopRoutes);
+// app.use(srcRoutes);
 app.use(authRoutes);
+app.use(adminRoutes);
+// app.use(logRoutes);
 
 app.get('/500', errorController.get500);
 
 app.use(errorController.get404);
 
 app.use((error, req, res, next) => {
+  console.log(`error = ${error}`);
   res.status(500).render('500', {
     pageTitle: 'Error!',
-    path: '/500',
-    isLoggedIn : true
+    path: '/500'
   });
 });
 
+
+
 mongoose.connect(MONGODB_URI)
 .then(result => {
-  app.listen(4000) ;
+  app.listen(4000, '0.0.0.0') ;
 }).catch(err => {
-  console.log(err);
+  console.log(`error = ${err}`);
 })
